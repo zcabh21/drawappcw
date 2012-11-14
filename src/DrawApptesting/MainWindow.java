@@ -2,6 +2,7 @@ package DrawApptesting;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
+import javafx.scene.image.Image;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import java.util.Random;
@@ -20,6 +21,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
@@ -130,7 +134,20 @@ Group drawing=new Group();
     
     public void setColour(Color colour)
     {
+       
         gc.setFill(colour);
+    }
+    public void setGradient(Color colour1,Color colour2){
+     RadialGradient rg = new RadialGradient(0,0,0,0,1,true, CycleMethod.NO_CYCLE, new Stop[]{
+             new Stop(0,colour1),
+             new Stop(1,colour2)
+         });
+     gc.setFill(rg);
+    }
+    
+    public void displayImage(String url,int x, int y,int width,int height){
+        Image img=new Image(url);
+        gc.drawImage(img, x, y, width, height);
     }
     
     public void drawLine(int x1, int y1, int x2, int y2)
@@ -147,6 +164,14 @@ Group drawing=new Group();
     {
         gc.fillRect(x1, y1, x2, y2);
     }
+    
+     public void fillOval(double x, double y, double w,double h)
+    {
+        gc.fillOval(x, y, w, h);
+       
+    }
+   
+    
     
     public void strokeText(int x, int y, String s)
     {

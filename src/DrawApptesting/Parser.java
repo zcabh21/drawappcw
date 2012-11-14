@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.StringTokenizer;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
 
 public class Parser 
 {
@@ -136,8 +139,28 @@ public class Parser
             return;
         }
         
+        if (command.equals("FC"))
+        {
+            System.out.println("IM IN FC");
+            fillOval(line.substring(2, line.length()));
+            return;
+        }
+        if (command.equals("DI"))
+        {
+            displayImage(line.substring(2, line.length()));
+            return;
+        }
+        
+        if (command.equals("SG"))
+        {
+            setGradient(line.substring(2, line.length()));
+            return;
+        }
+        
         throw new ParseException("Unknown drawing command");
     }
+    
+    
     
     private void drawLine(String args) throws ParseException
     {
@@ -187,6 +210,20 @@ public class Parser
     y2 = getInteger(tokenizer);
     frame.fillRect(x1, y1, x2, y2);
   }
+      
+      private void fillOval(String args) throws ParseException
+  {
+   double x = 0.0;
+    double y = 0.0;
+    double w = 0.0;
+    double h = 0.0;
+    StringTokenizer tokenizer = new StringTokenizer(args);
+    x = getDouble(tokenizer);
+    y = getDouble(tokenizer);
+    w = getDouble(tokenizer);
+     h = getDouble(tokenizer);
+   frame.fillOval(x,y, w,h);
+  }
 
   private void drawArc(String args) throws ParseException
   {
@@ -235,89 +272,154 @@ public class Parser
     s = args.substring(position+1,args.length());
     frame.strokeText(x,y,s);
   }
-    
+  
+  private void setGradient(String args) throws ParseException{
+   
+     String colour1="";
+     String colour2="";
+     StringTokenizer tokenizer=new StringTokenizer(args);
+     colour1=getString(tokenizer);
+     colour2=getString(tokenizer);
+    frame.setGradient(getColour(colour1),getColour(colour2));     
+   }
+  
+  private void displayImage(String args) throws ParseException{
+  String url="";
+  int x=0;
+  int y=0;
+  int width=0;
+  int height=0;
+  StringTokenizer tokenizer=new StringTokenizer(args);
+  url=getString(tokenizer);
+  x=getInteger(tokenizer);
+  y=getInteger(tokenizer);
+  width=getInteger(tokenizer);
+  height=getInteger(tokenizer);
+  frame.displayImage(url, x, y, width, height);
+  }
+    private Color getColour(String colourName) throws ParseException{
+        switch (colourName){
+        case ("black"): return (Color.BLACK);
+        case ("blue"): return (Color.BLUE);
+        case ("cyan"): return (Color.CYAN);
+        case("darkgray"): return (Color.DARKGRAY);
+        case("gray"): return (Color.GRAY);
+        case("green"): return Color.GREEN;
+        case("lightgray"): return Color.LIGHTGRAY;
+        case("magenta"): return Color.MAGENTA;
+        case("orange"): return Color.ORANGE;
+        case("pink"): return Color.PINK;
+        case("red"): return Color.RED;
+        case("white"): return Color.WHITE;
+        case("yellow"): return Color.YELLOW;
+        default:throw new ParseException("Invalid colour name in getColour");
+        }
+    }
+    /*
   private void setColour(String colourName) throws ParseException
   {
-      if(colourName.equals("black"))
-      {
-          frame.setColour(Color.BLACK);
-          return;
-      }
+      switch (colourName){
+        case ("black"): frame.setColour(Color.BLACK);
+        case ("blue"): frame.setColour(Color.BLUE);
+        case ("cyan"): frame.setColour(Color.CYAN);
+        case("darkgray"): frame.setColour(Color.DARKGRAY);
+        case("gray"): frame.setColour(Color.GRAY);
+        case("green"): frame.setColour(Color.GREEN);
+        case("lightgray"): frame.setColour(Color.LIGHTGRAY);
+        case("magenta"): frame.setColour(Color.MAGENTA);
+        case("orange"): frame.setColour(Color.ORANGE);
+        case("pink"): frame.setColour(Color.PINK);
+        case("red"): frame.setColour(Color.RED);
+        case("white"): frame.setColour(Color.WHITE);
+        case("yellow"): frame.setColour(Color.YELLOW);
+        default:throw new ParseException("Invalid colour name in SetColour");
+        }
       
-       if(colourName.equals("blue"))
-      {
-          frame.setColour(Color.BLUE);
-          return;
-      }
-      
-       if(colourName.equals("cyan"))
-      {
-          frame.setColour(Color.CYAN);
-          return;
-      }
-       
-        if(colourName.equals("darkgray"))
-      {
-          frame.setColour(Color.DARKGRAY);
-          return;
-      }
-        
-         if(colourName.equals("gray"))
-      {
-          frame.setColour(Color.GRAY);
-          return;
-      }
-         
-          if(colourName.equals("green"))
-      {
-          frame.setColour(Color.GREEN);
-          return;
-      }
-          
-           if(colourName.equals("lightgray"))
-      {
-          frame.setColour(Color.LIGHTGRAY);
-          return;
-      }
-           
-            if(colourName.equals("magenta"))
-      {
-          frame.setColour(Color.MAGENTA);
-          return;
-      }
-            
-             if(colourName.equals("orange"))
-      {
-          frame.setColour(Color.ORANGE);
-          return;
-      }
-             
-              if(colourName.equals("pink"))
-      {
-          frame.setColour(Color.PINK);
-          return;
-      }
-              
-               if(colourName.equals("red"))
-      {
-          frame.setColour(Color.RED);
-          return;
-      }
-               
-                if(colourName.equals("white"))
-      {
-          frame.setColour(Color.WHITE);
-          return;
-      }
-                
-                 if(colourName.equals("yellow"))
-      {
-          frame.setColour(Color.YELLOW);
-          return;
-      }
-                 
-      throw new ParseException("Invalid colour name");
   }
+     */
+    
+    private void setColour(String colourName) throws ParseException
+{
+if(colourName.equals("black"))
+{
+frame.setColour(Color.BLACK);
+return;
+}
+
+if(colourName.equals("blue"))
+{
+frame.setColour(Color.BLUE);
+return;
+}
+
+if(colourName.equals("cyan"))
+{
+frame.setColour(Color.CYAN);
+return;
+}
+
+if(colourName.equals("darkgray"))
+{
+frame.setColour(Color.DARKGRAY);
+return;
+}
+
+if(colourName.equals("gray"))
+{
+frame.setColour(Color.GRAY);
+return;
+}
+
+if(colourName.equals("green"))
+{
+frame.setColour(Color.GREEN);
+return;
+}
+
+if(colourName.equals("lightgray"))
+{
+frame.setColour(Color.LIGHTGRAY);
+return;
+}
+
+if(colourName.equals("magenta"))
+{
+frame.setColour(Color.MAGENTA);
+return;
+}
+
+if(colourName.equals("orange"))
+{
+frame.setColour(Color.ORANGE);
+return;
+}
+
+if(colourName.equals("pink"))
+{
+frame.setColour(Color.PINK);
+return;
+}
+
+if(colourName.equals("red"))
+{
+frame.setColour(Color.RED);
+return;
+}
+
+if(colourName.equals("white"))
+{
+frame.setColour(Color.WHITE);
+return;
+}
+
+if(colourName.equals("yellow"))
+{
+frame.setColour(Color.YELLOW);
+return;
+}
+
+throw new ParseException("Invalid colour name in setColour2");
+}
      
     private int getInteger(StringTokenizer tokenizer) throws ParseException
     {
@@ -325,6 +427,23 @@ public class Parser
             return Integer.parseInt(tokenizer.nextToken());
         else
             throw new ParseException("Missing Integer value");
+  }
+    
+      private Double getDouble(StringTokenizer tokenizer) throws ParseException
+    {
+        if (tokenizer.hasMoreTokens()){
+            System.out.println("I'm in setDouble");
+        return Double.parseDouble(tokenizer.nextToken());}
+        else
+            throw new ParseException("Missing Double value");
+  }
+    
+    private String getString(StringTokenizer tokenizer) throws ParseException
+    {
+        if (tokenizer.hasMoreTokens())
+            return tokenizer.nextToken();
+        else
+            throw new ParseException("Missing String value");
   }
     
 }

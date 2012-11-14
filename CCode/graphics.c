@@ -26,6 +26,22 @@ void fillRect(int x1, int x2, int x3, int x4)
   printf("FR %i %i %i %i\n", x1, x2, x3, x4);
 }
 
+void fillOval(double x, double y, double w, double h)
+{
+  printf("FC %f %f %f %f\n", x, y, w, h);
+}
+
+void setGradient(char* c1, char* c2)
+{
+  printf("SG %s %s\n", c1,c2);
+}
+
+void displayImage(char* url, int x, int y, int width,int height)
+{
+  printf("DI %s %i %i %i %i\n", url,x,y, width, height);
+}
+
+
 void drawString(char* s, int x, int y)
 {
   printf("DS %i %i @%s\n",x,y,s);

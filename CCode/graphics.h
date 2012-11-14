@@ -7,5 +7,7 @@ void drawOval(int,int,int,int);
 void drawArc(int,int,int,int,int,int);
 void fillRect(int,int,int,int);
 void drawString(char*,int,int);
-
+void displayImage(char*,int,int,int,int);
+void fillOval(double,double,double,double);
+void setGradient(char*,char*);
 void setColour(colour);
