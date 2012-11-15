@@ -11,3 +11,4 @@ void displayImage(char*,int,int,int,int);
 void fillOval(double,double,double,double);
 void setGradient(char*,char*);
 void setColour(colour);
+void changeDimensions(int,int);

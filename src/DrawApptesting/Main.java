@@ -1,13 +1,18 @@
 package DrawApptesting;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import javafx.scene.image.Image;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -19,7 +24,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradient;
@@ -32,44 +39,48 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 
-public class MainWindow extends Application
+public class Main extends Application
 { 
-    
-Group drawing=new Group();   
-
-   private Scene scene;
+    Group drawing; 
+    private HBox hb;
+    private Scene scene;
     private TextArea messageView;
-  
     private Canvas image;
     private GraphicsContext gc;
-    Stage primarStage; 
+    Stage primaryStage; 
     Reader reader;
     Parser parser;
-  
+    private int WIDTH=500;
+    private int HEIGHT=300;
     
-     private void init(Stage primaryStage ){
+         private void init(Stage primaryStage ){
 
-        primaryStage.setResizable(false);
+             drawing=new Group();
+        primaryStage.setResizable(true);
         BorderPane borderPane = new BorderPane();
-        scene = new Scene(borderPane, 800, 600);
+        scene = new Scene(borderPane, WIDTH+300, HEIGHT+300);
         
         borderPane.setTop(drawing);
         
         messageView = new TextArea();     
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(messageView);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        BorderPane.setMargin(messageView,new Insets(0));
+         
         Button quitButton = new Button("Close Window");
         Button stepButton = new Button("Next Step");
         Button allButton = new Button("Show all");
+        Button save=new Button("Save");
         borderPane.setCenter(scrollPane);
-        borderPane.setLeft(stepButton);
-        borderPane.setBottom(allButton);
-        borderPane.setRight(quitButton);
-        BorderPane.setAlignment(stepButton, Pos.BOTTOM_LEFT);
-        BorderPane.setAlignment(allButton, Pos.BOTTOM_CENTER);
-        BorderPane.setAlignment(quitButton, Pos.BOTTOM_RIGHT);
-        BorderPane.setMargin(drawing, new Insets(10));
+        BorderPane.setMargin(drawing, new Insets(100));
+       hb= new HBox(15);
+        hb.getChildren().addAll(stepButton,allButton,save,quitButton);
+        borderPane.setBottom(hb);
+        hb.setAlignment(Pos.CENTER);
         
         quitButton.setOnAction(new EventHandler<ActionEvent>() {
    
@@ -96,14 +107,24 @@ Group drawing=new Group();
             }
             });
         
+        save.setOnAction(new EventHandler<ActionEvent>() {
+   
+            @Override
+            public void handle(ActionEvent e) {
+                try {
+                    saveDrawing();
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+               postMessage("Image is saved.");
+            }
+            });
+        
          
-      image=new Canvas(500,300);
+      image=new Canvas(WIDTH,HEIGHT);
         drawing.getChildren().add(image);
          gc =image.getGraphicsContext2D();
-    
-       //  gc.setFill(Color.GREEN);
-      //  gc.setStroke(Color.BLUE);
-    
+  
         primaryStage.setScene(scene);
         primaryStage.setTitle("DrawApp");
       
@@ -114,9 +135,19 @@ Group drawing=new Group();
     
     public void postMessage(final String s)
     {
-        messageView.setText(s);
+              messageView.setText(s);
+                  
     }
     
+  /*  public void turtle(int x,int y, double angle){
+    startAt(x,y,angle);
+    forward(angle);
+    left(angle);
+    right(angle);
+    pen_up();
+    pen_down();
+    }
+    */
     protected void paintComponent(GraphicsContext gc)
     {
         gc.fillRect(0, 0, image.getWidth(), image.getHeight());   
@@ -170,8 +201,35 @@ Group drawing=new Group();
         gc.fillOval(x, y, w, h);
        
     }
-   
+     
+  public void changeDimensions(double width, double height){
+
+      gc.scale(width, height);
+      //image.setHeight(height);
+      //image.setWidth(width);
+     //drawing.prefHeight(height);
+      //drawing.prefWidth(width);
+     // drawing.resize(width, height);
+    //  drawing.maxHeight(height);
+    //  drawing.maxWidth(width);
+//drawing.setScaleX(width);  
+//drawing.setScaleY(height);
+messageView.setPrefHeight(height-100);
+messageView.setPrefWidth(width);
+hb.setPrefHeight(height-50);
+hb.setPrefWidth(width);
+
+   }
     
+
+public void saveDrawing() throws IOException{
+try{
+ImageIO.write(SwingFXUtils.fromFXImage(image.snapshot(null, null), null),"jpg",new File("Image"));
+        }
+catch(IOException e){
+    e.printStackTrace();
+}
+}
     
     public void strokeText(int x, int y, String s)
     {
@@ -194,9 +252,9 @@ Group drawing=new Group();
     
  
 	public void start(Stage primaryStage) throws Exception {
-       init(primaryStage);  
+       init(primaryStage); 
         reader = new InputStreamReader(System.in);
-        parser = new Parser(reader,this);
+       parser = new Parser(reader,this,primaryStage);
         primaryStage.show();
            
 	}

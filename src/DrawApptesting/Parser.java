@@ -8,18 +8,22 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
+import javafx.stage.Stage;
 
 public class Parser 
 {
     private BufferedReader reader; 
 
-    private MainWindow frame;
+    private Main frame;
+  private Stage primaryStage;
     
-    public Parser(Reader reader, MainWindow frame)
+    public Parser(Reader reader, Main frame,Stage primaryStage)
     {
         this.reader = new BufferedReader(reader);
  
         this.frame = frame;
+        
+        this.primaryStage=primaryStage;
     }
     
     public void parse()
@@ -59,7 +63,6 @@ public class Parser
     public int step_by_step(){
       try
         {
-            System.out.println("I enter the try");
             String line = reader.readLine();
            if(line!=null)
             {
@@ -141,7 +144,6 @@ public class Parser
         
         if (command.equals("FC"))
         {
-            System.out.println("IM IN FC");
             fillOval(line.substring(2, line.length()));
             return;
         }
@@ -156,6 +158,12 @@ public class Parser
             setGradient(line.substring(2, line.length()));
             return;
         }
+         if (command.equals("CD"))
+        {
+           changeDimension(line.substring(2, line.length()));
+            return;
+        }
+        
         
         throw new ParseException("Unknown drawing command");
     }
@@ -315,31 +323,31 @@ public class Parser
         default:throw new ParseException("Invalid colour name in getColour");
         }
     }
-    /*
-  private void setColour(String colourName) throws ParseException
-  {
-      switch (colourName){
-        case ("black"): frame.setColour(Color.BLACK);
-        case ("blue"): frame.setColour(Color.BLUE);
-        case ("cyan"): frame.setColour(Color.CYAN);
-        case("darkgray"): frame.setColour(Color.DARKGRAY);
-        case("gray"): frame.setColour(Color.GRAY);
-        case("green"): frame.setColour(Color.GREEN);
-        case("lightgray"): frame.setColour(Color.LIGHTGRAY);
-        case("magenta"): frame.setColour(Color.MAGENTA);
-        case("orange"): frame.setColour(Color.ORANGE);
-        case("pink"): frame.setColour(Color.PINK);
-        case("red"): frame.setColour(Color.RED);
-        case("white"): frame.setColour(Color.WHITE);
-        case("yellow"): frame.setColour(Color.YELLOW);
-        default:throw new ParseException("Invalid colour name in SetColour");
+    
+    private void changeDimension(String args) throws ParseException{
+    int width=-1;
+    int height=-1;
+    
+    StringTokenizer tokenizer=new StringTokenizer(args);
+  width=getInteger(tokenizer);
+ height=getInteger(tokenizer);
+ 
+   if((width<0)||(height<0)) {
+            throw new ParseException ("Invalid width or height.");
         }
-      
-  }
-     */
+
+ 
+primaryStage.setWidth(width);
+primaryStage.setHeight(height);
+
+     frame.changeDimensions(width,height);   
+    
+    } 
     
     private void setColour(String colourName) throws ParseException
 {
+    
+    
 if(colourName.equals("black"))
 {
 frame.setColour(Color.BLACK);
@@ -423,27 +431,32 @@ throw new ParseException("Invalid colour name in setColour2");
      
     private int getInteger(StringTokenizer tokenizer) throws ParseException
     {
-        if (tokenizer.hasMoreTokens())
+        if (tokenizer.hasMoreTokens()) {
             return Integer.parseInt(tokenizer.nextToken());
-        else
+        }
+        else {
             throw new ParseException("Missing Integer value");
+        }
   }
     
       private Double getDouble(StringTokenizer tokenizer) throws ParseException
     {
         if (tokenizer.hasMoreTokens()){
-            System.out.println("I'm in setDouble");
+           
         return Double.parseDouble(tokenizer.nextToken());}
-        else
+        else {
             throw new ParseException("Missing Double value");
+        }
   }
     
     private String getString(StringTokenizer tokenizer) throws ParseException
     {
-        if (tokenizer.hasMoreTokens())
+        if (tokenizer.hasMoreTokens()) {
             return tokenizer.nextToken();
-        else
+        }
+        else {
             throw new ParseException("Missing String value");
+        }
   }
     
 }
