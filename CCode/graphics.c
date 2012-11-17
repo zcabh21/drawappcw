@@ -1,7 +1,21 @@
 #include <stdio.h>
 #include "graphics.h"
 
-void changeDimensions(int width,int height){
+
+void setPosition(int x,int y){
+printf("SP %i %i\n",x,y);
+}
+void moveForward(int angle){
+printf("MF %i\n",angle);
+}
+void turnLeft(int angle){
+printf("TL %i\n",angle);
+}
+void turnRight(int angle){
+printf("TR %i\n",angle);
+}
+
+void changeDimension(int width,int height){
 printf("CD %i %i\n",width,height);
 }
 void drawLine(int x1, int x2, int x3, int x4)

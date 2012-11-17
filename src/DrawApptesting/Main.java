@@ -7,16 +7,14 @@ import java.io.Reader;
 import javafx.scene.image.Image;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -24,64 +22,71 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
-import javafx.scene.shape.ArcTo;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
 public class Main extends Application
 { 
-    Group drawing; 
+   
     private HBox hb;
     private Scene scene;
     private TextArea messageView;
     private Canvas image;
     private GraphicsContext gc;
-    Stage primaryStage; 
-    Reader reader;
-    Parser parser;
+    private Stage primaryStage; 
+    private Reader reader;
+    private Parser parser;
     private int WIDTH=500;
     private int HEIGHT=300;
+    private Turtle turtle;
+    private ScrollPane newcanvas;
     
-         private void init(Stage primaryStage ){
-
-             drawing=new Group();
+    private void init(Stage primaryStage ){
         primaryStage.setResizable(true);
+        
         BorderPane borderPane = new BorderPane();
-        scene = new Scene(borderPane, WIDTH+300, HEIGHT+300);
+        scene = new Scene(borderPane, WIDTH+300, HEIGHT+300);      
+       
+        newcanvas = new ScrollPane();
         
-        borderPane.setTop(drawing);
-        
-        messageView = new TextArea();     
+        image=new Canvas(WIDTH,HEIGHT);
+        gc =image.getGraphicsContext2D();       
+        turtle=new Turtle(gc);
+        newcanvas.setContent(image);
+        newcanvas.setFitToHeight(true);
+        newcanvas.setFitToWidth(true);
+        borderPane.setCenter(newcanvas);
+        BorderPane.setMargin(newcanvas,new Insets(10));
+               
+        messageView = new TextArea();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(messageView);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        BorderPane.setMargin(messageView,new Insets(0));
-         
+                
         Button quitButton = new Button("Close Window");
         Button stepButton = new Button("Next Step");
         Button allButton = new Button("Show all");
         Button save=new Button("Save");
-        borderPane.setCenter(scrollPane);
-        BorderPane.setMargin(drawing, new Insets(100));
-       hb= new HBox(15);
-        hb.getChildren().addAll(stepButton,allButton,save,quitButton);
-        borderPane.setBottom(hb);
-        hb.setAlignment(Pos.CENTER);
         
+        hb= new HBox(15);
+        hb.getChildren().addAll(stepButton,allButton,save,quitButton);
+        hb.setAlignment(Pos.CENTER);
+        FlowPane fp=new FlowPane();
+        fp.setVgap(2);
+        fp.setHgap(5);
+        fp.setMaxHeight(210);
+        fp.setOrientation(Orientation.VERTICAL);
+        fp.getChildren().addAll(messageView,hb);
+        borderPane.setBottom(fp);
+        fp.setAlignment(Pos.CENTER);   
+                
         quitButton.setOnAction(new EventHandler<ActionEvent>() {
    
             @Override
@@ -119,15 +124,10 @@ public class Main extends Application
                postMessage("Image is saved.");
             }
             });
-        
          
-      image=new Canvas(WIDTH,HEIGHT);
-        drawing.getChildren().add(image);
-         gc =image.getGraphicsContext2D();
-  
         primaryStage.setScene(scene);
         primaryStage.setTitle("DrawApp");
-      
+
     }
        
         
@@ -139,15 +139,10 @@ public class Main extends Application
                   
     }
     
-  /*  public void turtle(int x,int y, double angle){
-    startAt(x,y,angle);
-    forward(angle);
-    left(angle);
-    right(angle);
-    pen_up();
-    pen_down();
+   public Turtle getTurtle(){
+       return turtle;
     }
-    */
+    
     protected void paintComponent(GraphicsContext gc)
     {
         gc.fillRect(0, 0, image.getWidth(), image.getHeight());   
@@ -203,28 +198,16 @@ public class Main extends Application
     }
      
   public void changeDimensions(double width, double height){
-
-      gc.scale(width, height);
-      //image.setHeight(height);
-      //image.setWidth(width);
-     //drawing.prefHeight(height);
-      //drawing.prefWidth(width);
-     // drawing.resize(width, height);
-    //  drawing.maxHeight(height);
-    //  drawing.maxWidth(width);
-//drawing.setScaleX(width);  
-//drawing.setScaleY(height);
-messageView.setPrefHeight(height-100);
-messageView.setPrefWidth(width);
-hb.setPrefHeight(height-50);
-hb.setPrefWidth(width);
-
-   }
+      image.setHeight(height);
+      image.setWidth(width);
+        }
     
 
 public void saveDrawing() throws IOException{
 try{
-ImageIO.write(SwingFXUtils.fromFXImage(image.snapshot(null, null), null),"jpg",new File("Image"));
+    
+    
+ImageIO.write(SwingFXUtils.fromFXImage(image.snapshot(null, null), null),"png",new File("Image"+System.currentTimeMillis()));
         }
 catch(IOException e){
     e.printStackTrace();
@@ -254,7 +237,7 @@ catch(IOException e){
 	public void start(Stage primaryStage) throws Exception {
        init(primaryStage); 
         reader = new InputStreamReader(System.in);
-       parser = new Parser(reader,this,primaryStage);
+       parser = new Parser(reader,this);
         primaryStage.show();
            
 	}

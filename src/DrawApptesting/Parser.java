@@ -13,17 +13,18 @@ import javafx.stage.Stage;
 public class Parser 
 {
     private BufferedReader reader; 
-
-    private Main frame;
-  private Stage primaryStage;
+   
     
-    public Parser(Reader reader, Main frame,Stage primaryStage)
+    private Main frame;
+ 
+    
+    public Parser(Reader reader, Main frame)
     {
         this.reader = new BufferedReader(reader);
  
         this.frame = frame;
         
-        this.primaryStage=primaryStage;
+       
     }
     
     public void parse()
@@ -36,13 +37,7 @@ public class Parser
                 parseLine(line);
                 line = reader.readLine();
             }
-
-		/*String[] commands = {"DR 0 0 100 50"};
-
-		for(String s : commands) {
-			parseLine(s);
-		}*/
-           
+ 
         }
  
         catch(IOException e)
@@ -56,7 +51,7 @@ public class Parser
             frame.postMessage("Parse Exception: " + e.getMessage());
             return;
         } 
-        frame.postMessage("Drawing completed in parse");
+        frame.postMessage("Drawing is completed.");
     }
     
     
@@ -71,12 +66,9 @@ public class Parser
             }
            else{
                frame.postMessage("End.");
-                return -1;
-                  
-         
+                return -1;   
            }
         }
- 
         catch(IOException e)
         {
             frame.postMessage("Parse failed.");
@@ -88,7 +80,7 @@ public class Parser
             frame.postMessage("Parse Exception: " + e.getMessage());
             return 0;
         } 
-        frame.postMessage("Drawing completed in step");
+       frame.postMessage("This step is completed.");
        return 0;
     
     
@@ -100,6 +92,28 @@ public class Parser
         
         String command = line.substring(0, 2);
         
+        if(command.equals("SP")){ //turtle
+          
+            setPosition(line.substring(2,line.length())); 
+            return;
+        }
+        
+          if(command.equals("MF")){ //turtle
+          
+            moveForward(line.substring(2,line.length())); 
+            return;
+        }
+            if(command.equals("TL")){ //turtle
+          
+            turnLeft(line.substring(2,line.length())); 
+            return;
+        }
+              if(command.equals("TR")){ //turtle
+          
+            turnRight(line.substring(2,line.length())); 
+            return;
+        }
+          
         if (command.equals("DL"))
         {
             drawLine(line.substring(2,line.length())); 
@@ -120,6 +134,7 @@ public class Parser
         
         if (command.equals("SC"))
         {
+               
             setColour(line.substring(3, line.length()));
             return;
         }
@@ -155,6 +170,7 @@ public class Parser
         
         if (command.equals("SG"))
         {
+               
             setGradient(line.substring(2, line.length()));
             return;
         }
@@ -327,26 +343,50 @@ public class Parser
     private void changeDimension(String args) throws ParseException{
     int width=-1;
     int height=-1;
-    
-    StringTokenizer tokenizer=new StringTokenizer(args);
-  width=getInteger(tokenizer);
+ StringTokenizer tokenizer=new StringTokenizer(args);
+ width=getInteger(tokenizer);
  height=getInteger(tokenizer);
- 
    if((width<0)||(height<0)) {
             throw new ParseException ("Invalid width or height.");
         }
-
- 
-primaryStage.setWidth(width);
-primaryStage.setHeight(height);
-
-     frame.changeDimensions(width,height);   
+  
+    frame.changeDimensions(width,height);   
     
     } 
+  public void setPosition(String args) throws ParseException{
+  int x=0;
+  int y=0;
+  StringTokenizer tokenizer=new StringTokenizer(args);  
+  x=getInteger(tokenizer);
+  y=getInteger(tokenizer);
+  frame.getTurtle().setPosition(x, y);
+  
+    }
+     public void turnLeft(String args) throws ParseException{
+        int angle=0;
+          StringTokenizer tokenizer=new StringTokenizer(args);  
+angle=getInteger(tokenizer);
+   frame.getTurtle().left(angle);
+    }
+      public void turnRight(String args) throws ParseException{
+          int angle=0;
+          StringTokenizer tokenizer=new StringTokenizer(args);  
+angle=getInteger(tokenizer);
+   frame.getTurtle().right(angle);
+          
+    }
+    public void moveForward(String args) throws ParseException{
+  int distance=0;
+  StringTokenizer tokenizer=new StringTokenizer(args);  
+  distance=getInteger(tokenizer);
+   frame.getTurtle().moveForward(distance);
+      }
+   
+    
     
     private void setColour(String colourName) throws ParseException
 {
-    
+ 
     
 if(colourName.equals("black"))
 {
@@ -426,7 +466,7 @@ frame.setColour(Color.YELLOW);
 return;
 }
 
-throw new ParseException("Invalid colour name in setColour2");
+throw new ParseException("Invalid colour name in setColour");
 }
      
     private int getInteger(StringTokenizer tokenizer) throws ParseException
