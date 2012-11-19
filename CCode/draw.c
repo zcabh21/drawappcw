@@ -3,7 +3,7 @@
 
 int main(void){
 
-//changeDimension(400,400);
+changeDimension(500,500);
 
 //create birds using turtleMode
 setPosition(375,100);

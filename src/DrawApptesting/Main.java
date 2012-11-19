@@ -38,6 +38,8 @@ public class Main extends Application
     private Scene scene;
     private TextArea messageView;
     private Canvas image;
+    private ScrollPane newcanvas;
+    private BorderPane borderPane;
     private GraphicsContext gc;
     private Stage primaryStage; 
     private Reader reader;
@@ -45,48 +47,49 @@ public class Main extends Application
     private int WIDTH=500;
     private int HEIGHT=300;
     private Turtle turtle;
-    private ScrollPane newcanvas;
-    
+           
     private void init(Stage primaryStage ){
         primaryStage.setResizable(true);
-        
-        BorderPane borderPane = new BorderPane();
-        scene = new Scene(borderPane, WIDTH+300, HEIGHT+300);      
+        borderPane = new BorderPane();
+        scene = new Scene(borderPane, WIDTH+300, HEIGHT+300);          
        
-        newcanvas = new ScrollPane();
-        
         image=new Canvas(WIDTH,HEIGHT);
-        gc =image.getGraphicsContext2D();       
+        gc =image.getGraphicsContext2D(); 
         turtle=new Turtle(gc);
+        
+        newcanvas = new ScrollPane();
         newcanvas.setContent(image);
         newcanvas.setFitToHeight(true);
         newcanvas.setFitToWidth(true);
+       
         borderPane.setCenter(newcanvas);
-        BorderPane.setMargin(newcanvas,new Insets(10));
-               
-        messageView = new TextArea();
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(messageView);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
+        BorderPane.setMargin(newcanvas,new Insets(10));     
                 
         Button quitButton = new Button("Close Window");
         Button stepButton = new Button("Next Step");
         Button allButton = new Button("Show all");
         Button save=new Button("Save");
         
+        messageView = new TextArea();
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(messageView);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        
         hb= new HBox(15);
         hb.getChildren().addAll(stepButton,allButton,save,quitButton);
         hb.setAlignment(Pos.CENTER);
+        
         FlowPane fp=new FlowPane();
-        fp.setVgap(2);
+        fp.setVgap(10);
         fp.setHgap(5);
         fp.setMaxHeight(210);
         fp.setOrientation(Orientation.VERTICAL);
         fp.getChildren().addAll(messageView,hb);
+        
         borderPane.setBottom(fp);
         fp.setAlignment(Pos.CENTER);   
-                
+        
         quitButton.setOnAction(new EventHandler<ActionEvent>() {
    
             @Override
@@ -121,22 +124,17 @@ public class Main extends Application
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
-               postMessage("Image is saved.");
+               postMessage("Image is saved in the CCode folder.");
             }
             });
          
         primaryStage.setScene(scene);
         primaryStage.setTitle("DrawApp");
-
     }
-       
-        
-    
     
     public void postMessage(final String s)
     {
-              messageView.setText(s);
-                  
+              messageView.setText(s);          
     }
     
    public Turtle getTurtle(){
@@ -160,15 +158,17 @@ public class Main extends Application
     
     public void setColour(Color colour)
     {
-       
-        gc.setFill(colour);
+         gc.setFill(colour);
+         postMessage("The colour changed to:"+colour);
     }
+    
     public void setGradient(Color colour1,Color colour2){
      RadialGradient rg = new RadialGradient(0,0,0,0,1,true, CycleMethod.NO_CYCLE, new Stop[]{
              new Stop(0,colour1),
              new Stop(1,colour2)
          });
      gc.setFill(rg);
+     postMessage("The gradient changed to: "+colour1+" with "+colour2);
     }
     
     public void displayImage(String url,int x, int y,int width,int height){
@@ -194,25 +194,20 @@ public class Main extends Application
      public void fillOval(double x, double y, double w,double h)
     {
         gc.fillOval(x, y, w, h);
-       
     }
      
   public void changeDimensions(double width, double height){
       image.setHeight(height);
       image.setWidth(width);
+    }
+    
+  public void saveDrawing() throws IOException{
+    try{    
+        ImageIO.write(SwingFXUtils.fromFXImage(image.snapshot(null, null), null),"png",new File("Image"+System.currentTimeMillis()));
         }
-    
-
-public void saveDrawing() throws IOException{
-try{
-    
-    
-ImageIO.write(SwingFXUtils.fromFXImage(image.snapshot(null, null), null),"png",new File("Image"+System.currentTimeMillis()));
-        }
-catch(IOException e){
-    e.printStackTrace();
-}
-}
+    catch(IOException e){
+    }
+    }
     
     public void strokeText(int x, int y, String s)
     {
@@ -230,19 +225,16 @@ catch(IOException e){
     }
      
      public static void main(String[] args) {
-		launch(args);
+	launch(args);
 	}
     
- 
-	public void start(Stage primaryStage) throws Exception {
-       init(primaryStage); 
-        reader = new InputStreamReader(System.in);
-       parser = new Parser(reader,this);
-        primaryStage.show();
-           
-	}
-    
-   
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+         init(primaryStage); 
+         reader = new InputStreamReader(System.in);
+         parser = new Parser(reader,this);
+         primaryStage.show();
+    } 
 }
     
     

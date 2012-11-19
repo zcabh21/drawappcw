@@ -1,16 +1,13 @@
 package DrawApptesting;
+
 import javafx.scene.canvas.GraphicsContext;
-/**
- *
- * @author localuser*/
- 
+
 public class Turtle {
     
     private int x=0,y=0,angle=0;
     private GraphicsContext gc;
   
-    public Turtle(GraphicsContext gc){
-       
+    public Turtle(GraphicsContext gc){     
         this.gc=gc;
     }
     
@@ -33,10 +30,6 @@ public class Turtle {
 
     }
      public void right(int angle){ 
-this.angle += (90-angle); 
-}
-     
-    
-    
-    
+    this.angle += (90-angle); 
+    }    
 }
